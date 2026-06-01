@@ -1,5 +1,6 @@
 /*
  * Copyright 2009 Guy Van den Broeck
+ * Copyright 2026 IoTconsultancy.nl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -39,7 +40,7 @@ public class HTMLDifferTest {
 		String newText = "<p> This is a big blue book</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected an addition",result.indexOf("<p> This is a <span class=\"diff-html-added\"") > -1);
+		assertTrue("Expected an addition", containsHtml(result, "<p> This is a <span class=\"diff-html-added\""));
 	}
 	
 	/**
@@ -53,7 +54,7 @@ public class HTMLDifferTest {
 		String newText = "<p> This is a book</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected an removal",result.indexOf("<p> This is a <span class=\"diff-html-removed\"") > -1);
+		assertTrue("Expected an removal", containsHtml(result, "<p> This is a <span class=\"diff-html-removed\""));
 	}
 	
 	/**
@@ -67,8 +68,8 @@ public class HTMLDifferTest {
 		String newText = "<p> This is a green book</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected an removal",result.indexOf("<p> This is a <span class=\"diff-html-removed\"") > -1);
-		assertTrue("Expected an addition",result.indexOf("blue </span><span class=\"diff-html-added\"") > -1);
+		assertTrue("Expected an removal", containsHtml(result, "<p> This is a <span class=\"diff-html-removed\""));
+		assertTrue("Expected an addition", containsHtml(result, "blue </span><span class=\"diff-html-added\""));
 	}
 	
 	/**
@@ -83,7 +84,7 @@ public class HTMLDifferTest {
 		String newText = "<p id='sample'> This is a blue book</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected a change",result.indexOf("<p id=\"sample\">\n<span class=\"diff-html-changed\"") > -1);
+		assertTrue("Expected a change", containsHtml(result, "<p id=\"sample\">\n<span class=\"diff-html-changed\""));
 	}
 	
 
@@ -99,7 +100,7 @@ public class HTMLDifferTest {
 		String newText = "<p> This is a <b>blue</b> book</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected a change",result.indexOf("<p> This is a <b><span class=\"diff-html-changed\"") > -1);
+		assertTrue("Expected a change", containsHtml(result, "<p> This is a <b><span class=\"diff-html-changed\""));
 	}
 	
 	/**
@@ -114,7 +115,21 @@ public class HTMLDifferTest {
 		String newText = "<p> This is a red table</p>";
 		
 		String result = HtmlTestFixture.diff(oldText, newText);
-		assertTrue("Expected a removal",result.indexOf("<p> This is a <span class=\"diff-html-removed\"") > -1);
-		assertTrue("Expected an addition",result.indexOf("<span class=\"diff-html-added\"") > -1);
+		assertTrue("Expected a removal", containsHtml(result, "<p> This is a <span class=\"diff-html-removed\""));
+		assertTrue("Expected an addition", containsHtml(result, "<span class=\"diff-html-added\""));
+	}
+
+	/**
+	 * Returns whether the diff result contains the expected HTML fragment,
+	 * ignoring insignificant (serializer-dependent) whitespace.
+	 *
+	 * @param aResult       the full diff result
+	 * @param aExpectedHtml the HTML fragment that is expected to occur in the result
+	 * @return true if the (whitespace-normalized) result contains the fragment
+	 * @see TestHelper#normalizeWhitespace(String)
+	 */
+	private static boolean containsHtml(String aResult, String aExpectedHtml) {
+		return TestHelper.normalizeWhitespace(aResult)
+				.contains(TestHelper.normalizeWhitespace(aExpectedHtml));
 	}
 }

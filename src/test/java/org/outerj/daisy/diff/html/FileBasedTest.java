@@ -1,5 +1,6 @@
 /*
  * Copyright 2011 Carsten Pfeiffer
+ * Copyright 2026 IoTconsultancy.nl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -124,14 +125,18 @@ public class FileBasedTest{
 			throw ex;
 		}
 
-		if (!tempExpected.equals(tempResults)) {
+		// Compare ignoring insignificant (serializer-dependent) whitespace, so the
+		// suite is stable across JDKs that format the transformer output differently.
+		String tempExpectedNorm = TestHelper.normalizeWhitespace(tempExpected);
+		String tempResultsNorm = TestHelper.normalizeWhitespace(tempResults);
+		if (!tempExpectedNorm.equals(tempResultsNorm)) {
 			System.out.println("Length: expected: " + tempExpected.length() + ", actual: " + tempResults.length());
 			writeResultsFile(aTestDir, tempResults);
 			System.err.println("Expected:");
 			System.err.println(tempExpected);
 			System.err.println("Actual:");
 			System.err.println(tempResults);
-			assertEquals("Content for test: " + testDirectory, tempExpected, tempResults);
+			assertEquals("Content for test: " + testDirectory, tempExpectedNorm, tempResultsNorm);
 		}
 	}
 

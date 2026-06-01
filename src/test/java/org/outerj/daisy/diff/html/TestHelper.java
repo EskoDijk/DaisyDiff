@@ -1,5 +1,6 @@
 /*
  * Copyright 2011 Carsten Pfeiffer
+ * Copyright 2026 IoTconsultancy.nl
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -40,7 +41,32 @@ public class TestHelper {
 		File tempExpectedFile = new File(aDir, OLD_NAME);
 		return tempExpectedFile.exists();
 	}
-	
+
+	/**
+	 * Normalizes insignificant (formatting) whitespace so that test comparisons
+	 * are independent of the JVM's HTML serializer.
+	 *
+	 * Different JDKs format the XSLT/transformer output differently (amount of
+	 * indentation, and where newlines are inserted around block elements), which
+	 * may cause multi-line fixtures to mismatch even though the diff content is
+	 * identical. This method collapses runs of whitespace and removes whitespace
+	 * that is directly adjacent to a tag ('&gt;' ... or ... '&lt;'), exactly the
+	 * whitespace an HTML serializer may add or drop freely.
+	 *
+	 * @param aText the text to normalize (may be null)
+	 * @return the whitespace-normalized text, or null if the input was null
+	 */
+	public static String normalizeWhitespace(String aText) {
+		if (aText == null) {
+			return null;
+		}
+		String tempResult = aText.replace("\r", "");
+		tempResult = tempResult.replaceAll("\\s+", " "); // collapse whitespace runs
+		tempResult = tempResult.replaceAll(">\\s+", ">"); // drop whitespace after a tag
+		tempResult = tempResult.replaceAll("\\s+<", "<"); // drop whitespace before a tag
+		return tempResult.trim();
+	}
+
 	/**
 	 * Creates a new test helper. A file named "results.txt" is expected to
 	 * reside inside this directory.
